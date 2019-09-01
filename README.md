@@ -109,6 +109,7 @@ sublime https://www.sublimetext.com/
 ?>
 ```
 1.7 弱类型说明与传值与传址详解  
+变量的类型由值决定
 ```
 <?php
 //变量都是以$开始
@@ -139,7 +140,54 @@ echo $a;
 echo '<hr>';
 echo $b;
 ```
-1.8 掌握变量作用域知足      
+
+```
+<?php
+//地址传递 希望函数处理完之后影响外部的变量
+$a = 1;
+$b = &$a;
+echo $a;
+echo '<hr>';
+echo $b;
+echo '<hr>';
+$a = 2;
+echo $a;
+echo '<hr>';
+echo $b;
+```
+1.8 掌握变量作用域知识     
+```
+<?php
+//可变变量
+$name = 'word';
+$$name = 'zhangsan';
+echo $word;
+```
+
+```
+<?
+//超全局变量 $_GET, $_POST...
+var_dump($_GET);
+function show(){
+    var_dump($_GET);
+}
+show();
+
+//普通变量
+
+```
+```
+<?
+//普通变量 
+$name = 'zhangsan';
+print_r($GLOBALS['name']);
+function show(){
+    global $name;
+    echo $name;
+}
+show();
+```
+尽量少用global，会引起变量污染  
 1.9 变量检测与删除及全局变量删除技巧      
 1.10 非常好用的static静态变量      
 1.11 整型浮点数与8进制16进制转换操作      
