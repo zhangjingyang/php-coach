@@ -654,7 +654,8 @@ require_once '1.php';
 ```
 这种情况下，第二次包含时，是不会进行包含的。
 
-**include（require）与include_once（require_once）的抉择问题**
+**include（require）与include_once（require_once）的抉择问题**  
+
 通常：include_once和require_once会有性能上的下降，因为他需要判断之前是否包含过。一般情况下，也不太需要去考虑，除非这已经影响到你程序的性能了。
 
 require通常使用方法，这个函数通常放在 PHP 程序的最前面，PHP 程序在执行前，就会先读入 require 所指定引入的文件，使它变成 PHP 程序网页的一部份。常用的函数，亦可以这个方法将它引入网页中。
@@ -776,6 +777,20 @@ function_exists('sum');
 ```  
 1.37 教你清晰掌握递归算法 
 不讲也行，阶乘小例子     
+```
+<?php
+function recursive(int $num): int
+{
+    $result = 1;
+    if ($num == 1) {
+        return $result * 1;
+    } else {
+        return $result = $num * recursive($num - 1);
+    }
+}
+
+echo recursive(5);
+```
 1.38 关联数组与索引数组详解  
 PHP 中的数组实际上是一个有序映射。映射是一种把 values 关联到 keys 的类型。此类型在很多方面做了优化，因此可以把它当成真正的数组，或列表（向量），散列表（是映射的一种实现），字典，集合，栈，队列以及更多可能性。由于数组元素的值也可以是另一个数组，树形结构和多维数组也是允许的。
 ```
@@ -806,9 +821,171 @@ $players = [
 echo $player[1]['name'];
 ```
 1.39 通过指针读取数组元素      
-1.40 PHP7中使用list与foreach操作数组      
-1.41 数组函数array_push-array_pop-array_shift-array_unshift-count      
-1.42 数组函数array_key_exists-array_keys-array_values-in_array      
+```
+<?php
+//索引数组添加元素
+$arr = ['Sam'];
+$arr[1] = 'David';
+$arr[5] = 'Mike';
+$arr[5] = 'Joe';
+print_r($arr);
+
+//编号其实不用写，自增长的
+$arr[] = 'Jim';
+print_r($arr);
+```
+```
+<?php
+//操作关联数组
+$user = [
+    'name' => 'James',
+    'age' => 34,
+];
+$user['name'] = 'Lebron James';
+print_r($user);
+
+$users = [
+    ['name' => 'James', 'age' => 34],
+    ['name' => 'Harden', 'age' => 29],
+];
+$users[0]['name'] = 'Lebron James';
+print_r($users);
+```
+```
+<?php
+//指针
+$arr = ['James', 'Paul'];
+
+echo key($arr); //当前key
+echo '<hr>';
+echo current($arr); //当前value
+next($arr); //指针指向下一个元素，并返回下一个元素的值
+echo '<hr>';
+echo current($arr); //当前value
+prev($arr);
+echo current($arr); //指针指向上一个元素，并返回上一个元素的值
+var_dump(prev($arr)); //上面没有元素会返回false
+```
+
+1.40 PHP7中使用list与foreach操作数组  
+```
+<?php
+//list — 把数组中的值赋给一组变量
+// Warning
+// PHP 5 里，list() 从最右边的参数开始赋值； PHP 7 里，list() 从最左边的参数开始赋值。
+// 如果你用单纯的变量，不用担心这一点。 但是如果你用了具有索引的数组，通常你期望得到的结果和在 list() 中写的一样是从左到右的，但在 PHP 5 里实际上不是， 它是以相反顺序赋值的。
+// 通常而言，不建议依赖于操作的顺序，在未来可能会再次发生修改。
+//Warning 在 list() 执行过程中修改数组（比如使用 list($a, $b) = $b）将会产生不可预知的结果。
+
+//索引数组
+$arr = ['Sam', 'David'];
+list($a, $b) = $arr;
+echo $a;
+echo '<hr>';
+echo $b;
+//关联数组
+$user = ['name' => 'James', 'age' => 34];
+list('name' => $name, 'age' => $age) = $user;
+echo $age;
+//只想取某一个值
+$arr = [1, 2, 3];
+list(, , $c) = $arr;
+echo $c;
+```
+```
+<?php
+//应用案例
+$players = [
+    ['name' => '卡拉斯科', 'age' => 26],
+    ['name' => '哈姆西克', 'age' => 32],
+    ['name' => '龙东', 'age' => 30],
+    ['name' => '博阿滕', 'age' => 22],
+];
+
+while (list('name' => $name, 'age' => $age) = current($players)) {
+    echo "Player name is {$name}, age:{$age}. <br>";
+    next($players);
+}
+```
+```
+<?php
+//foreach
+$players = [
+    ['name' => '卡拉斯科', 'age' => 26],
+    ['name' => '哈姆西克', 'age' => 32],
+    ['name' => '龙东', 'age' => 30],
+    ['name' => '博阿滕', 'age' => 22],
+];
+foreach ($players as $player) {
+    print_r($player);
+}
+
+foreach ($players as $key => $value) {
+    echo $key . '=>' . $value['name'];
+}
+//练习：如何通过foreach批量修改值呢？ 每个人加10岁
+```
+1.41 数组函数array_push-array_pop-array_shift-array_unshift-count  
+```
+<?php
+//数组可以从前面压进去，也可从后面压进去，老数据也是一样
+
+$users = ['Jim', 'Kate'];
+count($users); //计算数组元素数量
+
+array_push($users, 'Lucy'); //从后压进去；
+print_r($users);
+
+$user = array_pop($users); //从后面弹出去
+print_r($users);
+
+array_unshift($users, 'David'); //从前面压进去
+print_r($users);
+
+array_shift($users); //从前面移除
+print_r($users);
+
+count($users);
+```
+
+1.42 数组函数array_key_exists-array_keys-array_values-in_array    
+```
+<?php
+//检测数组键名是否存在
+$allowImageType = ['jpeg' => 2000000, 'jpg' => 2000000, 'png' => 2000000];
+$file = 'test.gif';
+$ext = strtolower(substr(strrchr($file, '.'), 1));
+
+if (!array_key_exists($ext, $allowImageType)) {
+    echo 'wrong';
+} else {
+    echo 'success';
+}
+```
+```
+<?php
+$allowImageType = ['jpeg', 'jpg', 'png'];
+$file = 'test.gif';
+$ext = strtolower(substr(strrchr($file, '.'), 1));
+
+if (in_array($ext, $allowImageType)) {
+    echo 'success';
+} else {
+    echo 'wrong';
+}
+```
+```
+<?php
+$allowImageType = ['jpeg' => 2000000, 'jpg' => 2000000, 'png' => 2000000];
+$file = 'test.gif';
+$ext = strtolower(substr(strrchr($file, '.'), 1));
+
+if (!in_array($ext, array_keys($allowImageType))) {
+    echo 'error';
+} else {
+    echo 'success';
+}
+```
 1.43 数组函数array_filter-array_map-array_values      
 1.44 数组函数array_merge-array_change_key_case      
 1.45 递归算法改变多维数组键名      
