@@ -165,7 +165,7 @@ echo $word;
 ```
 
 ```
-<?
+<?php
 //超全局变量 $_GET, $_POST...
 var_dump($_GET);
 function show(){
@@ -177,7 +177,7 @@ show();
 
 ```
 ```
-<?
+<?php
 //普通变量 
 $name = 'zhangsan';
 print_r($GLOBALS['name']);
@@ -188,36 +188,623 @@ function show(){
 show();
 ```
 尽量少用global，会引起变量污染  
-1.9 变量检测与删除及全局变量删除技巧      
-1.10 非常好用的static静态变量      
-1.11 整型浮点数与8进制16进制转换操作      
-1.12 Boolean类型详细说明      
-1.13 获取PHP语言的帮助      
-1.14 字符串定义与header响应头设置      
-1.15 字符串转义详解      
-1.16 字符串定界符与strlen-mb_strlen函数使用      
-1.17 字符串函数trim-ucfirst-ucwords-strtolower      
-1.18 字符串函数md5-explode-implode-substr-mb_substr      
-1.19 PHP常量使用详解      
-1.20 算术运算符      
-1.21 赋值运算符      
-1.22 比较运算符与逻辑运算符      
-1.23 三元表达式??与?：及@使用      
-1.24 流程控制之if详解      
-1.25 流程控制之switch详解      
-1.26 流程控制之while-dowhile与for循环操作      
-1.27 流程控制之break与continue使用技巧      
-1.28 文件引入之include与require详解      
-1.29 文件引入之include_once与require_once      
-1.30 函数编程之结合现实案例清晰解读函数编程      
-1.31 通过命名空间namespace隔离函数      
-1.32 点语法与参数默认值及传值与传址特性      
-1.33 严格模式declare与参数类型约束      
+1.9 变量检测与删除及全局变量删除技巧   
+```
+<?php
+//检测变量
+var_dump(isset($name));
+$age = 10;
+var_dump(isset($age));
+//删除变量
+unset($age);
+var_dump(isset($age));
+```   
+```
+<?php
+$name = 'zhangsan';
+function make(){
+    global $name;
+    echo $name;
+    unset($name);//可以执行，但是删除不掉
+}
+make();
+echo $name;
+```
+1.10 非常好用的static静态变量  
+```
+<?php
+function make(){
+    $num = 1;
+    $num = $num + 1;
+    return $num . '<hr>';
+}
+echo make();
+echo make();
+echo make();
+```    
+```
+<?php
+//用作配置项 缓存...
+function make(){
+    static $num = 1;
+    $num = $num + 1;
+    return $num . '<hr>';
+}
+echo make();
+echo make();
+echo make();
+```    
+
+1.11 数据类型  
+```
+<?php
+/**
+ * string
+ * integer
+ * float
+ * array
+ * object
+ * boolean
+ * resource
+ * NULL
+ * Callback/Callable
+ */
+//整形
+//八进制(Octal) 十进制（Decimal） 十六进制(Hexadecimal)
+//777
+//7*8^2+7*8^1+7*8^0 = 511
+echo octdec(777);
+//FAF = 4015
+echo hexdec('FAF');
+
+//浮点数 小数 1.1
+
+```
+1.12 Boolean类型详细说明     
+```
+<?php
+var_dump(true);
+var_dump(false);
+var_dump(0 == false);
+var_dump(0.0 == false);
+var_dump(9 == false);
+var_dump(-0.9 == false);
+var_dump('' == false);
+var_dump('asd' == false);
+var_dump([] == false);
+var_dump([1,2,3] == false);
+var_dump(NULL == false);
+
+class Demo{
+
+}
+//基本不用对象来判断
+var_dump((new Demo()) == false);
+``` 
+1.13 获取PHP语言的帮助    
+www.php.net
+可以在线阅读也可以下载文档离线阅读    
+1.14 字符串定义与header响应头设置  
+```
+<?php
+//防止乱码
+header('Content-type:text/html;charset=utf-8');
+//单双引号的区别,为什么要加花括号
+$name = 'zhangsan';
+
+$str = "my name is {$name}hello";
+
+echo $str;
+```
+1.15 字符串转义详解   
+```
+<?php
+$str = "zhangsan \"Day\"";
+echo $str;
+echo '<hr>';
+echo "变量定义方法: \$string = 10";
+echo '<hr>';
+echo "输出 \\";
+echo '<hr>';
+//制表符
+echo "hello\t\t\tworld";
+echo '<hr>';
+//换行符
+echo "hello\nworld";
+```
+1.16 字符串定界符与strlen-mb_strlen函数使用  
+```
+<?php
+// $str = "<h1 style=\"color:red\">hello</h1>";
+// echo $str;
+
+
+//前面是什么字符串兽面是什么字符串，前后不能有空格
+$str = <<<php
+<h1 style="color:red">hello</h1>
+php;
+
+echo $str;
+```    
+```
+<?php
+//字符串连接
+$str = 'my name is';
+$name = 'zhangsan';
+
+echo $str . $name . '.';
+```
+```
+<?php
+$string = 'soowiekdjs';
+echo strlen($string);
+echo '<hr>';
+//中文一个字多于一个长度，使用mb库
+echo strlen('大家好');
+echo mb_strlen('大家好','utf8');
+```
+1.17 字符串函数trim-ucfirst-ucwords-strtolower 
+```
+<?php
+//查询函数库文档
+
+$str = "hello world";
+echo strlen($str);
+echo '<hr>';
+$str = "hello world   ";
+echo strlen($str);
+echo '<hr>';
+//默认删除空格
+echo strlen(trim($str));
+echo '<hr>';
+//去除首尾
+echo trim($str," dl");
+
+//ltrim,rtrim
+
+echo strtolower('AbCdEfG');
+echo '<hr>';
+echo strtoupper('AbCdEfG');
+echo '<hr>';
+echo ucfirst('word');
+echo '<hr>';
+echo ucwords('hello world');
+echo '<hr>';
+echo ucwords('hello|world','|');
+```
+1.18 字符串函数md5-explode-implode-substr-mb_substr  
+```
+<?php
+//md5函数吧一个字符串hash成一个32位的字符串
+//以前用来加密密码,现在不用了，有加密库
+echo md5('zhangsan');
+
+//特殊的方式不方便变成文件名 缓存
+$file = 'user1/info';
+echo md5($file) . '.php';
+```    
+```
+<?php
+//打散
+print_r(explode('.','www.ibm.com'));
+//合并
+$arr = ['email','zhangjy@cn.ibm.com'];
+echo implode(':',$arr);
+//截断
+$course = 'php:string function';
+echo substr($course,3);
+echo substr($course,0,4);
+
+$str = "php教程:字符串函数";
+echo mb_substr($str,6,null,'utf-8');
+```
+1.19 PHP常量使用详解   
+```
+<?php
+//常量规范大写
+//函数 灵活性好
+define('DB_HOST','localhost',true);
+// define('DB_HOST','127.0.0.1');
+define('DATA',[1,2,3]);
+//类的常量必须用const 执行效率高
+const DB_USER = 'root';
+echo DB_USER;
+```
+```
+<?php
+//常量不受访问限制
+const NAME = 'zhangsan';
+
+function show(){
+    echo NAME;
+}
+show();
+echo '<hr>';
+//检测一个常量是否被定义过
+var_dump(defined('NAME'));
+echo '<hr>';
+//系统常量
+echo PHP_OS;
+echo '<hr>';
+//查看所有常量
+print_r(get_defined_constants());
+```   
+1.20 算术运算符   
+```
+<?php
+//+ - * / %
+$a = 1;
+$b = 2;
+echo $a + $b;
+
+
+//++i,i++,--i,i--
+$c = 1;
+echo $c++;
+```   
+1.21 赋值运算符   
+```
+<?php
+//+= -= = *= /= %= .=
+```
+1.22 比较运算符与逻辑运算符    
+```
+<?php
+//== 类型不同会进行类型转换
+$a = 1;
+$b = 2;
+$c = false;
+$d = 0;
+var_dump($a == $b);
+echo '<hr>';
+//=== !==三个等号类型也要一样，不转换类型
+var_dump($c == $d);
+echo '<hr>';
+var_dump($c === $d);
+echo '<hr>';
+//>= <= != <> > < 
+
+//逻辑运算
+//&& || ! 优先级高
+var_dump(true && true);
+echo '<hr>';
+var_dump(true || false);
+echo '<hr>';
+var_dump(!ture);
+//and or优先级低 xor异或
+```
+
+1.23 三元表达式??与?：及@使用   
+```
+<?php
+echo true?'yes':'no';
+
+$name = 'zhangsan';
+echo $name?:'lisi';
+
+//?? 变量必须存在并且变量的值不能为空
+//一般用来处理数据库的null数据
+$a = 0;
+echo $name??'NO';
+$b = null;
+echo $b??'NO';
+echo $c??'No';
+
+//屏蔽警告错误 @
+@(20/0);
+```
+
+1.24 流程控制之if详解    
+```
+<?php
+$day = 'monday';
+if($day == 'monday'){
+    echo '饺子';
+} elseif($day == 'thuesday'){
+    echo '米线';
+}else{
+    echo '套餐';
+}
+
+//第二种写法
+$status = false;
+if($status):
+echo 11;
+else:
+echo 22;
+endif;
+```  
+1.25 流程控制之switch详解  
+```
+<?php
+$day = 'monday';
+
+switch($day){
+    case 'monday':
+        echo '星期一';
+        break;
+    case 'tuesday':
+        echo '星期二';
+        break;
+    case 'wensday':
+        echo '星期三';
+        break;
+}
+
+switch($day){
+    case 'monday':
+    case 'tuesday':
+    case 'wensday':
+        echo '工作日';
+        break;
+    default:
+        echo '周末';
+}
+
+// $age = 15;
+// switch($age){
+//     case $age < 12;
+//         echo '儿童';
+// }
+
+//其他写法
+// switch($status):
+//     case:
+//     default:
+// endswitch;
+```
+1.26 流程控制之while-dowhile与for循环操作     
+```
+<?php
+//跳出条件break continue return
+$a = 10;
+while($a--){
+    echo $a;
+    return 0;
+}
+$num = 10;
+while($num){
+    $num--;
+    if($num == 5){
+        break;
+    }
+}
+
+
+$num = 10;
+do{
+    $num--;
+}while($num > 0);
+```
+```
+<?php
+for($i = 10;$i > 0;$i--){
+    echo $i;
+}
+$num = 10;
+for(;;){
+    if($num == 0)break;
+    echo $num;
+    $num--;
+}
+```
+1.27 流程控制之break与continue使用技巧     
+break 结束当前 for，foreach，while，do-while 或者 switch 结构的执行。
+break 可以接受一个可选的数字参数来决定跳出几重循环。
+ break跳出当前循环体
+ break后加数字，跳出第几层循环。
+ continue跳出本次循环
+ continue加数字，跳过几次循环
+1.28 文件引入之include与require详解 
+共通代码引入
+
++ include函数：会将指定的文件读入并且执行里面的程序；
++ require函数：会将目标文件的内容读入，并且把自己本身代换成这些读入的内容；
+
+**inclue和require的区别**
+include与require除了在处理引入文件的方式不同外，最大的区别就是：include在引入不存文件时产生一个警告且脚本还会继续执行，而require则会导致一个致命性错误且脚本停止执行。 
+```
+<?php
+  include 'no.php';
+  echo '123';
+?>
+```
+如果no.php文件不存在，echo '123'这句是可以继续执行的.
+
+```
+<?php
+require 'no.php';
+echo '123';
+?>
+```
+如果no.php文件不存在，echo '123'这句是不执行的，在require时就停止了。
+
+include()与require()的功能相同，但在用法上却有一些不同，include()是有条件包含函数，而 require()则是无条件包含函数。
+
+例如在下面的一个例子中，如果变量$somgthing为真，则将包含文件somefile：
+```
+if($something){
+include("somefile");
+}
+```
+但不管$something取何值，下面的代码将把文件somefile包含进文件里：
+```
+if($something){
+require("somefile");
+}
+```
+1.29 文件引入之include_once与require_once     
++ include_once 函数：在脚本执行期间包含并运行指定文件。此行为和 include 语句类似，唯一区别是如果该文件中已经被包含过，则不会再次包含。如同此语句名字暗示的那样，只会包含一次；
++ require_once 函数：和 require 语句完全相同，唯一区别是 PHP 会检查该文件是否已经被包含过，如果是则不会再次包含 。
+
+**include与include_once的区别（require与require_once的区别）**
+include_once （require_once）语句在脚本执行期间包含并运行指定文件。此行为和 include （require）语句类似，区别是如果该文件中的代码已经被包含了，则不会再次包含，只会包含一次。include_once（require_once）需要查询一遍已加载的文件列表, 确认是否存在, 然后再加载。
+```
+<?php
+require '1.php';
+require '1.php';
+?>
+```
+这种情况下1.php被包含两次。
+```
+<?php
+require '1.php';
+require_once '1.php';
+?>
+```
+这种情况下，第二次包含时，是不会进行包含的。
+
+**include（require）与include_once（require_once）的抉择问题**
+通常：include_once和require_once会有性能上的下降，因为他需要判断之前是否包含过。一般情况下，也不太需要去考虑，除非这已经影响到你程序的性能了。
+
+require通常使用方法，这个函数通常放在 PHP 程序的最前面，PHP 程序在执行前，就会先读入 require 所指定引入的文件，使它变成 PHP 程序网页的一部份。常用的函数，亦可以这个方法将它引入网页中。
+
+include通常使用方法，这个函数一般是放在流程控制的处理部分中。PHP 程序网页在读到 include 的文件时，才将它读进来。这种方式，可以把程序执行时的流程简单化。
+
+理论上来说：include和require后面加不加括号对执行结果没有区别，但是加上括号效率较低，所以后面能不加括号就不加括号。
+
+1.30 函数编程之结合现实案例清晰解读函数编程    
+函数式编程不依赖、也不会改变外界的状态，只要给定输入参数，返回的结果必定相同。因此，每一个函数都可以被看做独立单元，很有利于进行单元测试（unit testing）和除错（debugging），以及模块化组合
+```
+<?php
+//函数一定有返回值，如果没有自定义，默认返回null
+function welcome($name){
+    echo 'hello ' . $name;
+}
+welcome('Mike');
+var_dump(welcome('Mike'));
+```
+1.31 通过命名空间namespace隔离函数 
+后面讲namespace再说
+1.32 点语法与参数默认值及传值与传址特性    
+```
+<?php
+//展示函数的灵活性，复用性
+function mobile($tel){
+    return substr($tel,0,-4).'****';
+}
+
+echo mobile('13998674839');
+```
+```
+<?php
+//变量作用域，函数参数传递方式
+function show($var){
+    $var++;
+    echo $var;
+}
+//地址传递
+function show(&$var){
+    $var++;
+    echo $var;
+}
+$var = 1;
+show($var);
+echo '<hr>';
+echo $var;
+```
+```
+<?php
+//点语法
+function sum(...$vars){
+    print_r($vars);
+    //array_sum($vars);
+}
+sum(1,2,3,4,5,6);
+```
+```
+<?php
+//函数参数的默认值
+function mobile($tel,$num=4,$fix='****'){
+    return substr($tel,0,-1*$num).$fix;
+}
+
+echo mobile('13998674839');
+echo '<hr>';
+echo mobile('13998674839',3,'###');
+```
+1.33 严格模式declare与参数类型约束 
+```
+<?php
+//严格模式下必须要类型一样，数字字符串也不可以
+// declare(strict_types = 1);
+function show(int $num){
+    return $num;
+}
+
+// var_dump(show('a'));//报错
+
+var_dump(show('1'));//非严格模式可以
+
+// function sum(int ...$nums){
+//     return array_sum($nums);
+// }
+
+```
 1.34 函数返回值约束      
-1.35 变量能见度与静态变量      
-1.36 变量函数的奇妙使用      
-1.37 教你清晰掌握递归算法      
-1.38 关联数组与索引数组详解      
+```
+<?php
+function sum(int ...$nums):int{
+    return array_sum($nums);
+}
+
+echo sum(1,2,3,4,5);
+
+//可以返回空或者指定类型数据 void没有返回值
+function show():?string{
+    return null;
+}
+
+show();
+```
+1.35 变量能见度与静态变量    
+重复知识点，可以考虑重新安排该知识点的授课顺序。
+   
+1.36 变量函数的奇妙使用    
+```
+<?php
+function sum(int ...$nums):int{
+    return array_sum($nums);
+}
+
+$callback = 'sum';
+
+echo $callback(1,2,3,4);
+
+//判断函数是否存在
+function_exists('sum');
+```  
+1.37 教你清晰掌握递归算法 
+不讲也行，阶乘小例子     
+1.38 关联数组与索引数组详解  
+PHP 中的数组实际上是一个有序映射。映射是一种把 values 关联到 keys 的类型。此类型在很多方面做了优化，因此可以把它当成真正的数组，或列表（向量），散列表（是映射的一种实现），字典，集合，栈，队列以及更多可能性。由于数组元素的值也可以是另一个数组，树形结构和多维数组也是允许的。
+```
+<?php
+//两种写法
+//数组下标从0开始
+$arr1 = array(1,2,3);
+
+$arr2 = [1,2,3,4];
+//索引数组0，1，2，3 默认
+
+//关联数组 key为字符串的数组
+$player = [
+    'name' => 'Messi',
+    'age' => '32',
+    'position' => 'SS'
+];
+echo $player['name'];
+//多维数组
+$players = [
+    ['name' => 'Messi',
+    'age' => '32',
+    'position' => 'SS'],
+    ['name' => 'CR',
+    'age' => '34',
+    'position' => 'LWF']
+];
+echo $player[1]['name'];
+```
 1.39 通过指针读取数组元素      
 1.40 PHP7中使用list与foreach操作数组      
 1.41 数组函数array_push-array_pop-array_shift-array_unshift-count      
