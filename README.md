@@ -987,25 +987,237 @@ if (!in_array($ext, array_keys($allowImageType))) {
 }
 ```
 1.43 数组函数array_filter-array_map-array_values      
+```
+<?php
+//array_filter();
+$players = [
+    ['name' => '卡拉斯科', 'age' => 26],
+    ['name' => '哈姆西克', 'age' => 32],
+    ['name' => '龙东', 'age' => 30],
+    ['name' => '博阿滕', 'age' => 22],
+];
+//筛选出年龄大于等于三十岁的球员
+$filterPlayers = array_filter($players,function($player){
+    return $player['age'] >= 30;
+});
+
+print_r($filterPlayers);
+```
+```
+<?php
+//array_map() 函数将用户自定义函数作用到数组中的每个值上，并返回用户自定义函数作用后的带有新值的数组。
+
+//回调函数接受的参数数目应该和传递给 array_map() 函数的数组数目一致。
+$players = [
+    ['name' => '卡拉斯科', 'age' => 26],
+    ['name' => '哈姆西克', 'age' => 32],
+    ['name' => '龙东', 'age' => 30],
+    ['name' => '博阿滕', 'age' => 22],
+];
+
+
+$mapUsers = array_map(function($player){
+    // unset($player['age']);
+    $player['club'] = '大连一方';
+    return $player;
+},$players);
+print_r($mapUsers);
+```
+```
+<?php
+//array_values() 返回 input 数组中所有的值并给其建立数字索引。
+$players = [
+    ['name' => '卡拉斯科', 'age' => 26],
+    ['name' => '哈姆西克', 'age' => 32],
+    ['name' => '龙东', 'age' => 30],
+    ['name' => '博阿滕', 'age' => 22],
+];
+$stringPlayers = array_map(function($player){
+    return implode('-',array_values($player));
+},$players);
+
+print_r($stringPlayers);
+```
+
 1.44 数组函数array_merge-array_change_key_case      
-1.45 递归算法改变多维数组键名      
-1.46 递归操作多维数组键值      
-1.47 超高效的数组值多维操作      
+```
+<?php
+/* array_merge() 将一个或多个数组的单元合并起来，一个数组中的值附加在前一个数组的后面。返回作为结果的数组。
+
+如果输入的数组中有相同的字符串键名，则该键名后面的值将覆盖前一个值。然而，如果数组包含数字键名，后面的值将不会覆盖原来的值，而是附加到后面。
+
+如果只给了一个数组并且该数组是数字索引的，则键名会以连续方式重新索引。 */
+
+//索引数组是合并
+$arr1 = [1,2,3,4,5];
+$arr2 = [6,7,8,9,10];
+print_r(array_merge($arr1,$arr2));
+//关联数组
+$arr3 = ['name' => 'Sam','age' => 20];
+$arr4 = ['name' => 'Gill','age' => 30];
+print_r(array_merge($arr3,$arr4));
+//带有数字索引的
+$arr5 = ['name' => 'Sam','age' => 20,1 => 1];
+$arr6 = ['name' => 'Gill','age' => 30,1 => 2];
+print_r(array_merge($arr5,$arr6));
+```
+```
+<?php
+// array_change_key_case() 将 array 数组中的所有键名改为全小写或大写。本函数不改变数字索引。
+$input_array = array("FirSt" => 1, "SecOnd" => 4);
+print_r(array_change_key_case($input_array, CASE_UPPER));
+```
+1.45 递归算法改变多维数组键名     
+此节为扩展，跳过 
+1.46 递归操作多维数组键值     
+此节为扩展，跳过  
+1.47 超高效的数组值多维操作 
+**array_walk_recursive**
+将用户自定义函数 callback 应用到 array 数组中的每个单元。本函数会递归到更深层的数组中去。       
 1.48 使用serialize序列化缓存操作与var_export文件持久化      
-1.49 时区概念与PHP管理时区      
-1.50 时间戳管理与timeµtime构建敏捷的脚本执行时间函数      
-1.51 使用date获取ISO标准时间与getdate使用      
-1.52 使用strtotime便捷的进行时间计算      
-1.53 使用DateTime类维护日期时间技巧      
-1.54 使用DateInterval获取时间差与常用时间计算技巧      
-1.55 数学函数在页码验证与验证码中的使用实例      
-1.56 正则表达式的边界符与元字符详解      
-1.57 正则表达式常用函数操作      
+```
+<?php
+$database = include 'config/database.php';
+// print_r($database);
+// var_export($database);
+
+$config = var_export($database,true);
+file_put_contents('database.php','<?php return ' . $config . ';');
+```
+```
+<?php
+/* serialize() 返回字符串，此字符串包含了表示 value 的字节流，可以存储于任何地方。
+
+这有利于存储或传递 PHP 的值，同时不丢失其类型和结构。 */
+
+$database = include 'config/database.php';
+echo serialize($database);
+$cache = serialize($database);
+print_r(unserialize($cache));
+```
+1.49 时区概念与PHP管理时区 
+这部分了解即可，大部分时候很少用到
+```
+<?php
+//时区PRC Asia/chongqing Asia/shanghai Asia/urumqi
+//可以通过修改php.ini的timezone，但是不够灵活，不建议使用
+date_default_timezone_set('PRC');//设置时区
+echo date_default_timezone_get();//查看时区
+echo date('Y-m-d h:i:s');
+```     
+1.50 时间戳管理与timeµtime构建敏捷的脚本执行时间函数   
+```
+<?php
+//时间戳，从1970年1月1日 0：0：0到现在的秒数
+date_default_timezone_set('PRC');
+echo time();
+echo '<hr>';
+echo microtime();//返回微秒
+echo '<hr>';
+echo microtime(true);//返回浮点数，可以用来计算程序执行时间
+```   
+1.51 使用date获取ISO标准时间与getdate使用    
+```
+<?php
+date_default_timezone_set('PRC');
+echo date('Y-m-d h:i:s');//此处查看文档学习
+echo date('Y-m-d h:i:s',time()-3600);//一小时之前的时间
+
+print_r(getdate());//返回时间相关的数组
+```  
+1.52 使用strtotime便捷的进行时间计算    
+```
+<?php
+//字符串转日期 很常见 日期插件
+echo strtotime('2018-08-08');
+echo '<hr>';
+echo date('Y-m-d H:i:s',1533686400);
+echo '<hr>';
+echo strtotime('now');//获取当前时间戳
+echo '<hr>';
+echo strtotime('+1 year');//加1年 主要是培养看手册的习惯
+echo '<hr>';
+echo strtotime('next friday');//加1年 主要是培养看手册的习惯
+```  
+1.53 使用DateTime类维护日期时间技巧   
+```
+<?php
+//php时间日期类
+//DateTime DateInterval DateTimezone
+$timezone = new DateTimeZone('PRC');
+$dateTime = new DateTime();
+//$dateTime = new DateTime(‘2018-08-08’);
+// $dateTime->setDate();
+// DateTime::createFromFormat('Y/m/d','2018/08/08');
+$dateTime->setTimezone($timezone);
+echo $dateTime->format('Y-m-d H:i:s');//ISO格式
+echo $dateTime->format('U');//unix时间戳
+```
+1.54 使用DateInterval获取时间差与常用时间计算技巧 
+```
+<?php
+$dateTime1 = new DateTime();
+$dateTime2 = new DateTime('2019-10-27 0:0:0');
+$interval = $dateTime1->diff($dateTime2);
+echo $interval->format('%m个月%d天,共%a天');
+```     
+1.55 数学函数在页码验证与验证码中的使用实例     
+```
+<?php
+echo ceil(10.2);//向上取整
+echo floor(10.2);//向下取整
+
+echo max(1,3);//取最大值
+echo min(1,3);//取最小值
+
+echo round(10.2);//四舍五入
+echo round(10.5);
+
+echo mt_rand(1,999);//取1-999的随机数
+```
+练习：写一个生成验证码的字符串
+```
+$str = '1234567890asdfghjklzxcv';
+$str[0];
+```
+1.56 正则表达式的边界符
+正则表达式涉及篇幅较多，在这里只做函数使用的简单介绍，关于正则表达式的知识自学
+```
+<?php
+//正则表达式，又称规则表达式。（英语：Regular Expression，在代码中常简写为regex、regexp或RE），计算机科学的一个概念。正则表达式通常被用来检索、替换那些符合某个模式(规则)的文本。
+//边界符// ## @@都可以
+$status = preg_match('/a/','sodifjosida');//查看是否有a
+var_dump($status);
+```
+1.57 正则表达式常用函数操作 
+```
+<?php
+$str = '1@2@3';
+preg_match('/\d+/',$str,$matches);//匹配第一个
+print_r($matches);
+
+preg_match_all('/\d/',$str,$matches);//匹配所有
+print_r($matches);
+
+$arr = preg_split('/@|#/',$str);//拆分
+print_r($arr);
+
+echo preg_replace_callback('/\d+/',function($matches){
+    if($matches[0]>2){
+        return $matches[0] +200;
+    }
+    return $matches[0];
+},$str);
+```
 1.58 php文件操作常用函数使用   
+```
+
+```
 
 ## 第一天下午
 ### 2. PHP数据库操作之PDO
 2.1 PHP操作数据库说明与建议    
+主要介绍PDO，现在实际操作都是应用框架。
 2.2 快速连接Mysql数据库    
 2.3 PDO处理错误类型详解    
 2.4 PDO快速操作执行语句    
