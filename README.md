@@ -1272,13 +1272,169 @@ try {
 }
 ```
 2.5 快速操作MYSQL查询    
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_CASE,PDO::CASE_UPPER);//字段名大小写,一般不用设置
+    $query = $pdo->query("select * from users");
+    $rows = $query->fetchAll();
+    print_r($rows);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
 2.6 对返回结果集多样设置    
+```
+<?php
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+/*     PDO::FETCH_ASSOC：返回一个索引为结果集列名的数组
+    PDO::FETCH_BOTH（默认）：返回一个索引为结果集列名和以0开始的列号的数组
+    PDO::FETCH_NUM：返回一个索引为以0开始的结果集列号的数组
+    PDO::FETCH_OBJ：返回一个属性名对应结果集列名的匿名对象 */
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+    $query = $pdo->query("select * from users");
+    $rows = $query->fetchAll();
+    // print_r($rows);
+    $json_data = json_encode($rows);
+    print_r($json_data);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+
+```
 2.7 单条循环获取MYSQL结果集    
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+    $query = $pdo->query("select * from users where id >= 2");
+    // print_r($query->fetch());
+    // print_r($query->fetch());
+    // print_r($query->fetch());
+    while($row = $query->fetch()){
+        echo $row['name'];
+        echo '<hr>';
+    }
+
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
 2.8 预准备前奏SQL注入实例讲解    
+http://localhost/php-coach/2/8/1.php?id=1
+http://localhost/php-coach/2/8/1.php?id=1 or id>0
+超出预想的
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+    $query = $pdo->query("select * from users where id = {$_GET['id']} ");
+    $rows = $query->fetchAll();
+    print_r($rows);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
 2.9 预准备从根据杜绝SQL注入实操    
+http://localhost/php-coach/2/9/1.php?id=1 or id>0
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+
+    $sth = $pdo->prepare("select * from users where id = :id");//:id命名符
+    $sth->execute([':id'=>$_GET['id']]);
+    $rows = $sth->fetchAll();
+    print_r($rows);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
 2.10 预准备的执行语句操作    
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+
+    $sth = $pdo->prepare("INSERT INTO USERS (name,age) VALUES (:name,:age)");//:id命名符
+    $sth->execute([':name'=>'James',':age'=>34]);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
 2.11 使用占位符发送预准备操作    
-2.12 高可用查询生成器构建    
+```
+<?php
+//执行语句
+header('Content-type:text/html;charset=utf8');
+include '../dbconf.php';
+$dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
+    $config['host'],
+    $config['database'],
+    $config['charset']);
+try {
+    $pdo = new PDO($dsn, $config['user'], $config['password']);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);//字段名大小写
+
+    $sth = $pdo->prepare("select * from users where id > ? and id < ?");//？占位符
+    $sth->execute([1,3]);//注意顺序
+    $rows = $sth->fetchAll();
+    print_r($rows);
+} catch (PDOException $e) {
+    die($e->getMessage());
+}
+```
+2.12 高可用查询生成器构建   
+之后课程涉及到面向对象，而且不涉及到新知识点，是对之前知识点的具体应用案例，所以忽略不讲 
 2.13 添加预准备操作到查询生成器    
 2.14 查询器链式操作机制    
 2.15 使用生成器完成查询  
@@ -1304,8 +1460,75 @@ try {
   
 ### 4.错误处理  
 4.1 开发时显示错误信息  
+在开发的时候我们希望把错误显示出俩，在生产环境中，我们希望把错误输出的错误日志中。
+找到php.ini文件
+查看display_errors = On是否开启
+
 4.2 PHP语言中的多种错误类型详解  
+1. 语法错误
+php在执行前会分析代码
+```
+<?php
+echo 2//没有分号，报语法错误
+```
+2. 运行时错误
+```
+<?php
+echo 1;
+require 'common';//该文件不存在
+```
+3. 逻辑错误
+```
+<?php
+for($i = 0;$i < 5;$i--){//死循环，需要自己注意
+    echo $i;
+}
+```
 4.3 常见错误类型与不同场景使用策略  
+**常见错误类型**
+|值|常量|说明|
+|--|--|--|
+|1|E_ERROR (integer)|致命的运行时错误。这类错误一般是不可恢复的情况，例如内存分配导致的问题。后果是导致脚本终止不再继续运行。|
+|2|E_WARNING (integer)|	运行时警告 (非致命错误)。仅给出提示信息，但是脚本不会终止运行。|
+|8|E_NOTICE (integer)|运行时通知。表示脚本遇到可能会表现为错误的情况，但是在可以正常运行的脚本里面也可能会有类似的通知。|
+|64|E_COMPILE_ERROR (integer)|致命编译时错误。类似E_ERROR, 但是是由Zend脚本引擎产生的。|
+|2048|E_STRICT (integer)|启用 PHP 对代码的修改建议，以确保代码具有最佳的互操作性和向前兼容性。|
+|8192|E_DEPRECATED (integer)|运行时通知。启用后将会对在未来版本中可能无法正常工作的代码给出警告。|
+|30719|E_ALL (integer)|E_STRICT出外的所有错误和警告信息。|
+（@）在PHP中用作错误控制操作符。当表达式附加@符号时，将忽略该表达式可能生成的错误消息。
+```
+<?php
+@require 'a';
+```
+我们可以通过error_reporting()函数来控制显示错误的级别
+也可以通过修改php.ini的error_reporting属性来控制显示错误的级别
+建议使用函数方式控制，比较灵活，也不受服务器配置限制
+```
+<?php
+
+// 关闭所有PHP错误报告
+error_reporting(0);
+
+// Report simple running errors
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+// 报告 E_NOTICE也挺好 (报告未初始化的变量
+// 或者捕获变量名的错误拼写)
+error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+
+// 除了 E_NOTICE，报告其他所有错误
+error_reporting(E_ALL ^ E_NOTICE);
+
+// 报告所有 PHP 错误 (参见 changelog)
+error_reporting(E_ALL);
+
+// 报告所有 PHP 错误
+error_reporting(-1);
+
+// 和 error_reporting(E_ALL); 一样
+ini_set('error_reporting', E_ALL);
+```
+开发环境全显示
 4.4 开发超方便的自定义错误处理引擎  
 4.5 高效处理不同错误类型提供响应视图  
 4.6 使用DEBUG来处理错误应用场景  
