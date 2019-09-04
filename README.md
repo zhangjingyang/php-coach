@@ -1558,10 +1558,104 @@ ini_set('error_reporting', E_ALL);
   
 ### 6. PHP面向对象  
 6.1 通俗易懂的面向对象OOP分析  
+举个最简单点的例子来区分 面向过程和面向对象
+
+有一天你想吃鱼香肉丝了，怎么办呢？你有两个选择
+1、自己买材料，肉，鱼香肉丝调料，蒜苔，胡萝卜等等然后切菜切肉，开炒，盛到盘子里。
+
+2、去饭店，张开嘴：老板！来一份鱼香肉丝！
+
+看出来区别了吗？这就是1是面向过程，2是面向对象。
+
+面向对象有什么优势呢？首先你不需要知道鱼香肉丝是怎么做的，降低了耦合性。如果你突然不想吃鱼香肉丝了，想吃洛阳白菜，对于1你可能不太容易了，还需要重新买菜，买调料什么的。对于2，太容易了，大喊：老板！那个鱼香肉丝换成洛阳白菜吧，提高了可维护性。总的来说就是降低耦合，提高维护性！
+
+面向过程是具体化的，流程化的，解决一个问题，你需要一步一步的分析，一步一步的实现。
+
+面向对象是模型化的，你只需抽象出一个类，这是一个封闭的盒子，在这里你拥有数据也拥有解决问题的方法。需要什么功能直接使用就可以了，不必去一步一步的实现，至于这个功能是如何实现的，管我们什么事？我们会用就可以了。
+
+面向对象的底层其实还是面向过程，把面向过程抽象成类，然后封装，方便我们我们使用的就是面向对象了。
+
+面向过程：
+
+优点：性能比面向对象好，因为类调用时需要实例化，开销比较大，比较消耗资源。
+缺点：不易维护、不易复用、不易扩展.
+
+优点：易维护、易复用、易扩展，由于面向对象有封装、继承、多态性的特性，可以设计出低耦合的系统，使系统 更加灵活、更加易于维护 .
+缺点：性能比面向过程差
+
 6.2 类与对象分析与命名规范  
+对象是通过类生成出来的
+类命第一个字母要大写
+类有属性和方法
+```
+<?php
+class User{
+    private $name;
+    public function say(){
+        return 'hello ' . $this->name;
+    }
+    public function setName(string $name){
+        $this->name = $name;
+    }
+}
+
+$obj = new User;
+// var_dump($obj);
+$obj->setName('world');
+echo $obj->say();
+```
 6.3 $this关键指针详细解读  
+$this代表的是当前对象的指针
+属性是专属于不同对象的，方法是共用的
+```
+<?php
+class User{
+    private $name;
+    public function say(){
+        return 'hello ' . $this->getName();
+    }
+    public function setName(string $name){
+        $this->name = $name;
+    }
+    public function getName(){
+        return $this->name;
+    }
+}
+
+$obj = new User;
+$obj->setName('world');
+echo $obj->say();
+echo '<hr>';
+$user = new User;
+$user->setName('Sam');
+echo $user->say();
+```
 6.4 Static静态变量使用场景详解  
+static和self关键字
+static属性是属于类本身的
+self代表当前类
+```
+<?php
+class User{
+    protected $name;
+    protected static $group = 'visitor';
+    public function say(){
+        return self::$group . 'hello ' . $this->getName();
+    }
+    public function setName(string $name){
+        $this->name = $name;
+    }
+    public function getName(){
+        return $this->name;
+    }
+}
+
+$obj = new User;
+$obj->setName('world');
+echo $obj->say();
+```
 6.5 静态方法什么时候使用  
+静态方法不能使用$this,类的公共操作，效率高
 6.6 const类常量使用详解  
 6.7 使用extends继承实现复用  
 6.8 父类方法和属性重写实例操作  
@@ -1575,6 +1669,12 @@ ini_set('error_reporting', E_ALL);
 6.16 trait访问权限控制  
 6.17 多重trait与抽象及静态方法的使用  
 6.18 类方法和属性的访问控制  
+|关键字|权限|
+|--|--|
+|public| 表示全局，类内部外部子类都可以访问|
+|private|表示私有的，只有本类内部可以使用|
+|protected|表示受保护的，只有本类或子类或父类中可以访问|
+
 6.19 构造函数与析构函数实例解析  
 6.20 见识__get与__set的真实用例  
 6.21 使用魔术方法操作对象属性  
