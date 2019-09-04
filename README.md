@@ -1655,13 +1655,138 @@ $obj->setName('world');
 echo $obj->say();
 ```
 6.5 静态方法什么时候使用  
-静态方法不能使用$this,类的公共操作，效率高
+静态方法不能使用$this,类的公共操作，效率高,一般工具类使用较多，用起来比较方便，效率快。
+```
+<?php
+class Area
+{
+    public static function square(int $a, int $b)
+    {
+        return $a * $b;
+    }
+}
+
+echo Area::square(3, 4);
+```
 6.6 const类常量使用详解  
+```
+<?php
+class Area
+{
+    const PIE = 3.14;
+    public static function square(int $a, int $b)
+    {
+        return $a * $b;
+    }
+    public static function circle(float $r)
+    {
+        return self::PIE * $r * $r;
+    }
+}
+
+echo Area::circle(2);
+```
 6.7 使用extends继承实现复用  
+```
+<?php
+class Monsters
+{
+    protected $hp = 100;
+    protected $mp = 100;
+    protected $attack = 5;
+    protected $defence = 2;
+
+    public function shout()
+    {
+        return 'Lok Tar!';
+    }
+}
+
+class Goblin extends Monsters
+{
+    public function beat()
+    {
+        echo $this->shout();
+        echo ' attack value is ' . $this->attack;
+    }
+}
+
+(new Goblin)->beat();
+```
 6.8 父类方法和属性重写实例操作  
+```
+<?php
+class Monsters
+{
+    protected $hp = 100;
+    protected $mp = 100;
+    protected $attack = 5;
+    protected $defence = 2;
+
+    public function shout()
+    {
+        return 'Lok Tar!';
+    }
+
+    public function magic()
+    {
+        echo 'fireball';
+    }
+}
+
+class Goblin extends Monsters
+{
+    protected $attack = 4;
+    public function beat()
+    {
+        echo $this->shout();
+        echo ' attack value is ' . $this->attack;
+    }
+
+    public function magic()
+    {
+        echo 'throw lance';
+    }
+}
+
+(new Goblin)->magic();
+
+```
 6.9 禁止重写策略  
+父类的方法在function前加关键字final可以禁止继承类重写该方法
 6.10 抽象类与抽象方法解释的明明白白  
+**什么是php抽象方法？**
+抽象方法是没有方法体的方法，没有方法体是指方法声明时没有花括号以及其中的内容，而是声明方法时直接在方法名后加上分号结束，声明抽象方法要使用abstract关键字修饰。声明抽象方法格式：abstract function();
+**什么是php抽象类？**
+只要声明抽象方法的类就是抽象类，抽象类也要使用abstract关键字修饰，抽象类中可以有不是抽象方法的方法和成员属性，但访问权限不能是私有（private关键字修饰的）。
+**PHP中的抽象类作用？**
+抽象类是不能直接使用，抽象类中没有被实现的抽象方法，所以抽象类是不能被实例化的，创建不了对象，也就不能使用它。抽象类不能直接使用，它有什么作用？使用抽象类包含了继承关系，它作为它的子类定义的公共接口，它的操作交给它的子类实现。换句话说抽象类是作为子类重载模板使用的，在某种程度上说抽象类就是一种规范，这种规范是要求它的子类遵守，子类按照自己的需求去实现。
+```
+<?php
+abstract class BaseAction
+{
+    abstract public function log();
+}
+
+class Action extends BaseAction
+{
+    public function log()
+    {
+        echo 'log';
+    }
+}
+
+(new Action())->log();
+```
 6.11 带你把接口理解的清清楚楚  
+使用接口（interface），可以指定某个类必须实现哪些方法，但不需要定义这些方法的具体内容。
+接口是通过 interface 关键字来定义的，就像定义一个标准的类一样，但其中定义所有的方法都是空的。
+接口中定义的所有方法都必须是公有，这是接口的特性。
+
+要实现一个接口，使用 implements 操作符。类中必须实现接口中定义的所有方法，否则会报一个致命错误。类可以实现多个接口，用逗号来分隔多个接口的名称。
+实现多个接口时，接口中的方法不能有重名。
+接口也可以继承，通过使用 extends 操作符。
+类要实现接口，必须使用和接口中所定义的方法完全一致的方式。否则会导致致命错误。
 6.12 父类方法调用场景实例  
 6.13 使用trait实现变相多继承  
 6.14 多重类继承优先级处理  
