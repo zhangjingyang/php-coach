@@ -1537,18 +1537,124 @@ ini_set('error_reporting', E_ALL);
 
 ### 5. PHP SESSION 和 COOKIE  
 5.1 HTTP无状态场景分析与解决思路  
+cookie 是服务器留在用户计算机中的小文件，网站可以用它来识别访问网站的计算机。
 5.2 COOKIE业务原理分析  
 5.3 服务器写入COOKIE与浏览器处理过程  
+***创建 cookie***
+通过 setcookie() 函数来创建一个 cookie ，成功返回 TRUE ，否则返回 FALSE 。
+**创建 cookie 的例子：**
+```
+<?php
+setcookie("username", "xiaoli", time()+3600);
+```
+在该例子中，我们设置了一个名称为 username 的cookie，其值为 xiaoli ，并在1小时候后过期。如果时间也被省略，cookie 将会在会话结束后（一般是浏览器关闭）失效。
+
+cookie 会以一定格式被存储在用户计算机特定位置。
+
+**一个更完整的例子：**
+```
+<?php
+setcookie("username", "xiaoli", time()+3600, "/", "localhost");
+```
+该例子使用了 path 和 domain 参数，即在 5idev.com 域名的 / 路径下该 cookie 都有效（即全站有效）。
+
+**读取 cookie**
+PHP 内置了 $_COOKIE 变量以访问设置的 cookie 值。
+
+例子：
+```
+<?php
+echo $_COOKIE["username"];	//输出 xiaoli
+```
+使用 isset() 函数来检测 cookie 变量是否已经被设置：
+```
+<?php
+if (isset($_COOKIE["username"])) {
+    echo "欢迎你： ".$_COOKIE["username"];
+} else {
+    echo "请登陆";
+}
+```
+**销毁 cookie**
+可以通过设置 cookie 过期时间为以前的时间点来销毁一个 cookie ：
+```
+<?php
+setcookie("username", "", time()-3600);
+
+```
+**提示**
++ 由于协议限制，在设置 cookie 之前，不能有任何内容向浏览器输出
++ cookie 不会在设置的当前页生效，要访问设置的 cookie ，必须是另一个页面在过期之前访问
++ 由于 cookie 信息存储于用户的计算机中，那么就有可能伪造 cookie 从而造成 cookie 欺骗，一般可以对 cookie 的值进行加密来预防欺骗。读取 cookie 的时候，对 cookie 解密即可
+
 5.4 COOKIE生命周期实例详解  
 5.5 COOKIE作用路径PATH使用技巧  
 5.6 子域名COOKIE共享实例  
 5.7 COOKIE的HTTPS访问限制与JAVASCRIPT禁止操作  
 5.8 服务器端SESSION工作原理详解  
+**PHP Session 概述**
+session 是一种客户与网站（服务器）更为安全的对话方式。一旦开启了 session 会话，便可以在网站的任何页面使用（保持）这个会话，从而让访问者与网站之间建立了一种“对话”机制。
+
+常见的网上购物车，就是一个session会话的典型应用。我们在预定商品的时候，将选择好的商品放入购物车，实际就是开启一个商品的session会话。如果对选择的商品下了订单，则会将对应信息写入数据库；如果最终没有下订单，在用户关闭浏览器或退出登陆的时候，则会关闭session会话，选择的商品随即失效。
+
+session 会话会为每一个开启了 session 会话的访问者建立一个唯一的会话 ID ，用于识别用户。该会话 ID 可能存储于用户电脑的 cookie 内，也可能通过 URL 来传递。而对应的具体 session 值会存储于服务器端，这也是与 cookie 的主要区别，并且安全性相对较高。
+
+**创建 session**
+要创建 session ，必须先使用 session_start() 函数开启一个 session 会话，系统会分配一个会话 ID：
++ 通过phpinfo查看session文件存储路径（C:\xampp\tmp）
++ 打开文件夹
+
+**读取 session**
+PHP 内置的 $_SESSION 变量可以很方便的访问设置的 session 变量。
+```
+<?php
+session_start();
+$_SESSION['name'] = 'Mike';
+var_dump($_SESSION);
+```
 5.9 SESSION共享体验与会话变量操作  
+```
+<?php
+session_start();
+$_SESSION['name'] = 'Mike';
+var_dump($_SESSION);
+unset($_SESSION['name']);
+$_SESSION = [];
+session_destroy();//删除session文件
+```
 5.10 修改SESSION储存目录优化性能  
+如果一个服务器运行多个网站，都放在一个目录下不现实，影响性能
+通过session_save_path()函数可以指定存储路径
+```
+<?php
+session_save_path('session');
+session_start();
+$_SESSION['name'] = 'Mike';
+var_dump($_SESSION);
+```
 5.11 session_id与session_name函数使用  
+```
+<?php
+session_name('php-course');
+session_id(md5('php-course'));
+session_start();
+$_SESSION['name'] = 'Mike';
+var_dump($_SESSION);
+```
 5.12 GC垃圾回收的SESSION原理分析  
+
+session.gc_divisor 与 session.gc_probability 合起来定义了在每个会话初始化时启动 gc（garbage collection 垃圾回收）进程的概率。此概率用 gc_probability/gc_divisor 计算得来。例如 1/100 意味着在每个请求中有 1% 的概率启动 gc 进程。session.gc_divisor 默认为 100。
+
+比如：session.gc_maxlifetime=30，session.gc_divisor=1000，session.gc_probability=1，就表示每一千个用户调用session_start()的时候，就百分百的会执行一次垃圾回收机制，将磁盘上没用的session文件删除。
+
+注意：一般对于一些大型的门户网站，建议将session.gc_divisor调大一点，减少开销
+```
+session.gc_probability=1
+session.gc_divisor=1000
+session.gc_maxlifetime=1440
+```
 5.13 实例操作SESSION的GC垃圾回收  
+修改php配置文件之后要重启才能生效
 5.14 初始自定义SESSION引擎类  
 5.15 实现SESSION引擎类的开关读写卸垃方法  
 5.16 测试优化自定义SESSION引擎  
@@ -1787,12 +1893,212 @@ class Action extends BaseAction
 实现多个接口时，接口中的方法不能有重名。
 接口也可以继承，通过使用 extends 操作符。
 类要实现接口，必须使用和接口中所定义的方法完全一致的方式。否则会导致致命错误。
+```
+<?php
+interface CacheInterface{
+    public function get();
+    public function set();
+}
+
+class Mysql implements CacheInterface{
+    public function get(){
+
+    }
+    public function set(){
+
+    }
+}
+
+class Redis implements CacheInterface{
+    public function get(){
+
+    }
+    public function set(){
+
+    }
+}
+
+class Cache{
+    public static function instance($driver){
+        switch(strtolower($driver)){
+            case 'mysql':
+                return new Mysql;
+            case 'redis':
+                return new Redis;
+        }
+    }
+}
+
+$cache = Cache::instance('redis');
+var_dump($cache);
+```
 6.12 父类方法调用场景实例  
+使用parent关键字调用父类方法
+```
+<?php
+class Monsters
+{
+    protected $hp = 100;
+    protected $mp = 100;
+    protected $attack = 5;
+    protected $defence = 2;
+
+    public function shout()
+    {
+        return 'Lok Tar!';
+    }
+
+    public function magic()
+    {
+        echo 'fireball';
+    }
+
+    public function die(){
+        $this->knock_down();
+        $this->disappear();
+    }
+
+    public function knock_down(){
+        echo 'knock down ';
+    }
+
+    public function disappear(){
+        echo 'disappear';
+    }
+}
+
+class Goblin extends Monsters
+{
+    protected $attack = 4;
+    public function beat()
+    {
+        echo $this->shout();
+        echo ' attack value is ' . $this->attack;
+    }
+
+    public function magic()
+    {
+        echo 'throw lance';
+    }
+
+    public function die(){
+        echo 'time is money. ';
+        parent::die();
+    }
+}
+
+(new Goblin)->die();
+```
 6.13 使用trait实现变相多继承  
+Trait 是为类似 PHP 的单继承语言而准备的一种代码复用机制。Trait 为了减少单继承语言的限制，使开发人员能够自由地在不同层次结构内独立的类中复用 method。
+Trait 和 Class 相似，但仅仅旨在用细粒度和一致的方式来组合功能。 无法通过 trait 自身来实例化。它为传统继承增加了水平特性的组合；也就是说，应用的几个 Class 之间不需要继承。
+```
+<?php
+trait Log{
+    public function log(){
+        return __METHOD__;
+    }
+}
+
+trait Comment{
+    public function total(){
+        return __METHOD__;
+    }
+}
+
+class Topic{
+    use Log,Comment;
+}
+
+$topic = new Topic;
+echo $topic->log();
+```
 6.14 多重类继承优先级处理  
+```
+<?php
+trait Log{
+    public function log(){
+        return __METHOD__;
+    }
+}
+
+trait Comment{
+    public function total(){
+        return __METHOD__;
+    }
+}
+
+class Site{
+    public function total(){
+        return __METHOD__;
+    }
+}
+
+class Topic extends Site{
+    use Log,Comment;
+    // public function total(){
+    //     return __METHOD__;
+    // }
+}
+
+$topic = new Topic;
+echo $topic->total();
+```
 6.15 解决trait冲突这么容易  
+```
+<?php
+trait Log{
+    public function save(){
+        return __METHOD__;
+    }
+}
+
+trait Comment{
+    public function save(){
+        return __METHOD__;
+    }
+}
+
+class Topic{
+    use Log,Comment{
+        Log::save insteadOf Comment;
+        Comment::save as send;
+    }
+}
+
+$topic = new Topic;
+echo $topic->save();
+echo $topic->send();
+```
 6.16 trait访问权限控制  
+```
+<?php
+trait Log{
+    public function save(){
+        return __METHOD__;
+    }
+}
+
+trait Comment{
+    public function save(){
+        return __METHOD__;
+    }
+}
+
+class Topic{
+    use Log,Comment{
+        Log::save insteadOf Comment;
+        Log::save as protected;
+        Comment::save as protected send;
+    }
+}
+
+$topic = new Topic;
+echo $topic->save();
+echo $topic->send();
+```
 6.17 多重trait与抽象及静态方法的使用  
+trait也可以使用其他的trait，也可以在trait里面定义抽象和静态方法
 6.18 类方法和属性的访问控制  
 |关键字|权限|
 |--|--|
@@ -1801,11 +2107,132 @@ class Action extends BaseAction
 |protected|表示受保护的，只有本类或子类或父类中可以访问|
 
 6.19 构造函数与析构函数实例解析  
+```
+<?php
+class Capcha{
+    protected $width;
+    protected $height;
+    protected $len;
+    public function __construct(int $width = 500, int $height = 100,int $len = 5){
+        $this->width = $width;
+        $this->height = $height;
+        $this->len = $len;
+    }
+
+    public function show(){
+        echo "width = {$this->width}, height = {$this->height} ";
+    }
+
+    public function __destruct(){
+        echo __METHOD__;
+    }
+}
+
+$code = new Capcha(300);
+$code->show();
+```
 6.20 见识__get与__set的真实用例  
+在给不可访问属性赋值时，__set() 会被调用。
+读取不可访问属性的值时，__get() 会被调用。
+```
+<?php
+class Model{
+    private $id;
+    private $name;
+
+    public function __get($name){
+        return $this->$name;
+    }
+
+    public function __set($name,$value){
+        $this->$name = $value;
+    }
+}
+
+$model = new Model;
+$model->id = 1;
+echo $model->id;
+```
 6.21 使用魔术方法操作对象属性  
+当对不可访问属性调用 isset() 或 empty() 时，__isset() 会被调用。
+当对不可访问属性调用 unset() 时，__unset() 会被调用。
 6.22 __call原来可以这么神奇的使用  
+在对象中调用一个不可访问方法时，__call() 会被调用。
+```
+<?php
+class Model{
+    private $id;
+    private $name;
+
+    public function __get($name){
+        return $this->$name;
+    }
+
+    public function __set($name,$value){
+        $this->$name = $value;
+    }
+
+    public function __call($name,$arg){
+        $action = 'getAttribute' . ucfirst($name);
+        if(method_exists($this,$action)){
+            return call_user_func_array([$this,$action],$arg);
+        }
+    }
+
+    public function getAttributePhone(){
+        echo 'phone';
+    }
+}
+
+
+
+$model = new Model;
+$model->phone();
+```
 6.23 教你正确使用__callStatic的技巧  
-  
+在静态上下文中调用一个不可访问方法时，__callStatic() 会被调用。
+```
+<?php
+class Model{
+    private $id;
+    private $name;
+
+    public function __get($name){
+        return $this->$name;
+    }
+
+    public function __set($name,$value){
+        $this->$name = $value;
+    }
+
+    public function __call($name,$arg){
+        $action = 'getAttribute' . ucfirst($name);
+        if(method_exists($this,$action)){
+            return call_user_func_array([$this,$action],$arg);
+        }
+    }
+
+    public function getAttributePhone(){
+        echo 'phone';
+    }
+
+    public static function __callStatic($name,$arg){
+        switch($name){
+            case 'do':
+                return call_user_func_array([new static(),'did'],$arg);
+            break;
+        }
+    }
+
+    public static function did(){
+        echo 'did';
+    }
+}
+
+
+
+Model::do();
+```
 ### 7. 命名空间  
 7.1 NAMESPACE解决什么样的问题  
 7.2 全名空间最基础演示  
