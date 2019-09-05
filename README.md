@@ -1540,7 +1540,8 @@ ini_set('error_reporting', E_ALL);
 cookie 是服务器留在用户计算机中的小文件，网站可以用它来识别访问网站的计算机。
 5.2 COOKIE业务原理分析  
 5.3 服务器写入COOKIE与浏览器处理过程  
-***创建 cookie***
+https://www.php.net/manual/zh/function.setcookie.php  
+**创建 cookie**  
 通过 setcookie() 函数来创建一个 cookie ，成功返回 TRUE ，否则返回 FALSE 。
 **创建 cookie 的例子：**
 ```
@@ -1588,9 +1589,15 @@ setcookie("username", "", time()-3600);
 + 由于 cookie 信息存储于用户的计算机中，那么就有可能伪造 cookie 从而造成 cookie 欺骗，一般可以对 cookie 的值进行加密来预防欺骗。读取 cookie 的时候，对 cookie 解密即可
 
 5.4 COOKIE生命周期实例详解  
+浏览器的过期时间是以UTC时区显示
 5.5 COOKIE作用路径PATH使用技巧  
 5.6 子域名COOKIE共享实例  
+通过设置域名参数 例如有两个域名，一个为www.test.com 另一为edu.test.com
+把域名参数设置为.test.com或test.com即可使其他子域名都可以访问cookie
+
 5.7 COOKIE的HTTPS访问限制与JAVASCRIPT禁止操作  
+通过设置secure和httponly参数即可  
+
 5.8 服务器端SESSION工作原理详解  
 **PHP Session 概述**
 session 是一种客户与网站（服务器）更为安全的对话方式。一旦开启了 session 会话，便可以在网站的任何页面使用（保持）这个会话，从而让访问者与网站之间建立了一种“对话”机制。
@@ -2235,8 +2242,42 @@ Model::do();
 ```
 ### 7. 命名空间  
 7.1 NAMESPACE解决什么样的问题  
+命名空间解决的是类重名的问题，我们在实际项目中会用很多第三方的依赖，很难保证不发生重名现象。
+
 7.2 全名空间最基础演示  
+```
+<?php
+namespace App\Controller;
+
+class User
+{
+    public static function make()
+    {
+        return __METHOD__;
+    }
+}
+```
+```
+<?php
+
+namespace Helper;
+
+function show()
+{
+    return __METHOD__;
+}
+```
+```
+<?php
+include 'User.php';
+include 'helper.php';
+
+echo App\Controller\User::make();
+
+echo Helper\show();
+```
 7.3 命名空间限定规则使用详解  
+参照代码  
 7.4 函数与常量在命名空间中的特殊性  
 7.5 命名空间特殊关键字  
 7.6 奇妙的类与空间声明  
