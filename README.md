@@ -1445,8 +1445,43 @@ try {
   
 ### 3. 异常处理  
 3.1 异常处理解决什么问题与传统错误处理方式  
+传统自己通过判断返回错误信息
+这部分不用介绍也行
 3.2 Exception异常处理比传统错误处理这么高效  
+```
+<?php
+
+try{
+    throw new Exception('Opps');
+}catch(Exception $e){
+   echo $e->getMessage();
+}
+```
 3.3 多个异常类使用场景详解  
+```
+<?php
+class ValidException extends Exception{
+
+}
+
+class CheckException extends Exception{
+    public function __toString(){
+        return $this->getFile() . $this->getLine();
+    }
+}
+
+try{
+    throw new CheckException('valid exception');
+}catch(ValidException $e){
+    echo '111';
+}catch(CheckException $e){
+    echo $e;
+}catch(Exception $e){
+    echo '333';
+}finally{
+    echo '444';
+}
+```
 3.4 异常处理优先级问题  
 3.5 异常类内置方法使用操作  
 3.6 异常处理引擎之composer构建  
@@ -2279,18 +2314,47 @@ echo Helper\show();
 7.3 命名空间限定规则使用详解  
 参照代码  
 7.4 函数与常量在命名空间中的特殊性  
+函数如果没有namespace限制是属于全局的，但是如果当前命名空间有函数和引入文件的函数重名，会优先调用当前命名空间的函数。
+通过define定义的常量不受namespace的限制，通过const定义的常量受命名空间的限制。
+参照代码  
 7.5 命名空间特殊关键字  
+namespace关键字和__NAMESPACE__变量的使用，这两个用的比较少，做一下了解。  
+参照代码  
 7.6 奇妙的类与空间声明  
+如果一个命名空间特别长的话，多次调用就会很麻烦，通过声明空间和类可以使代码得到简化。
+参照代码  
 7.7 多个类声明的定义  
+可以用逗号对不同声明进行分割也可以用多个use，一般使用多个use，排版显得比较整齐。
+```
+use A,B;
+
+use A;
+use B;
+```
 7.8 引入冲突原来这么好解决  
+通过使用as关键字给冲突的类命起别名
+```
+use App\A;
+use Server\A as AServer;
+```
 7.9 超简单使用类自动加载处理  
+使用spl_autoload_register进行自动加载，被引入的子类也可以使用自动加载
+参照代码
 7.10 使用面向对象方式实现自动加载  
+详见代码  
 7.11 使用Composer自动加载真方便  
+
 7.12 自动加载任意类型文件  
   
 ### 8. composer的使用  
 8.1 composer原理分析  
+https://php.cnpkg.org/
+https://developer.aliyun.com/composer
+github->packgist->local
+github->packgist->mirron->local
 8.2 window环境下安装composer  
+添加php环境变量
+直接安装exe文件就可以了
 8.3 在github中创建自己的开源项目  
 8.4 创建composer.json文件及在packagist.org中提交项目  
 8.5 composer整合github实现自动推送  
