@@ -2356,9 +2356,19 @@ github->packgist->mirron->local
 添加php环境变量
 直接安装exe文件就可以了
 8.3 在github中创建自己的开源项目  
+创建之后在本地git clone
 8.4 创建composer.json文件及在packagist.org中提交项目  
+
 8.5 composer整合github实现自动推送  
+webhooks
 8.6 定义composer自动加载autoload配置与实例框架控制器  
+更新完之后不要忘记composer dump更新一下
 8.7 创建视图层  
 8.8 使用composer安装packagist中的软件包  
+安装gregwar/captcha依赖
 8.9 使用国内composer镜像服务器快速安装packagist模块  
+
+
+--prefer-dist 会从github 上下载.zip压缩包，并缓存到本地。下次再安装就会从本地加载，大大加速安装速度。但她没有保留 .git文件夹,没有版本信息。适合基于这个package进行开发。
+
+--prefer-source 会从github 上clone 源代码，不会在本地缓存。但她保留了.git文件夹，从而可以实现版本控制。适合用于修改源代码。
