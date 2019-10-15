@@ -1578,7 +1578,7 @@ cookie 是服务器留在用户计算机中的小文件，网站可以用它来�
 https://www.php.net/manual/zh/function.setcookie.php  
 **创建 cookie**  
 通过 setcookie() 函数来创建一个 cookie ，成功返回 TRUE ，否则返回 FALSE 。
-**创建 cookie 的例子：**
+**创建cookie的例子：**
 ```
 <?php
 setcookie("username", "xiaoli", time()+3600);
