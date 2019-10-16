@@ -1,2 +1,3 @@
 <?php
-echo mt_rand(0,1);
+$s = "hello world";
+print_r(explode(' ',$s));
