@@ -1,6 +1,8 @@
 <?php
-include 'Captcha.php';
-session_start();
-$captcha = new Captcha();
-$code = $captcha->render();
-$_SESSION['captcha'] = $code;
+
+include 'autoload.php';
+
+use App\Captcha as Captcha;
+
+$captcha = new Captcha\Captcha();
+// $captcha->render();

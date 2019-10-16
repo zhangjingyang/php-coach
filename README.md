@@ -1602,7 +1602,7 @@ cookie 是服务器留在用户计算机中的小文件，网站可以用它来�
 https://www.php.net/manual/zh/function.setcookie.php  
 **创建 cookie**  
 通过 setcookie() 函数来创建一个 cookie ，成功返回 TRUE ，否则返回 FALSE 。
-**创建 cookie 的例子：**
+**创建cookie的例子：**
 ```
 <?php
 setcookie("username", "xiaoli", time()+3600);
@@ -2396,3 +2396,6 @@ webhooks
 --prefer-dist 会从github 上下载.zip压缩包，并缓存到本地。下次再安装就会从本地加载，大大加速安装速度。但她没有保留 .git文件夹,没有版本信息。适合基于这个package进行开发。
 
 --prefer-source 会从github 上clone 源代码，不会在本地缓存。但她保留了.git文件夹，从而可以实现版本控制。适合用于修改源代码。
+
+
+https://packagist.org/about#how-to-update-packages
