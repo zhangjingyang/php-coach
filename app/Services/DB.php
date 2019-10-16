@@ -11,6 +11,13 @@ class DB
     private $config;
     private $dsn;
     private $conn;
+    private $options = [
+        'table' => '',
+        'fields' => '*',
+        'where' => '',
+        'order' => '',
+        'limit' => ''
+    ];
 
 
     private function __construct()
@@ -47,17 +54,63 @@ class DB
         return self::$__instance;
     }
 
-    public function query(string $sql, array $vars)
+    public function query(string $sql, array $vars = [])
     {
-        // $stmt = $this->conn->prepare($sql);
-        // var_dump($stmt);
-        // $result = $stmt->execute($vars);
-        // return $result;
-        $result = $this->conn->query($sql);
-        return $result->fetchAll();
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($vars);
+            $result = $stmt->fetchAll();
+            return $result;
+        } catch (PDOException $e) {
+            $e->getMessage();
+        }
+    }
+
+    public function execute(string $sql, array $vars)
+    {
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($vars);
+    }
+
+    public function table($table)
+    {
+        $this->options['table'] = $table;
+        return $this;
+    }
+
+    public function field(...$fields)
+    {
+        $fieldsStr = '`' . implode('`,`', $fields) . '`';
+        $this->options['fields'] = $fieldsStr;
+        return $this;
+    }
+
+    public function where($where)
+    {
+        $this->options['where'] = ' WHERE ' . $where;
+        return $this;
+    }
+
+    public function order($order)
+    {
+        $this->options['order'] = ' ORDER BY ' . $order;
+        return $this;
+    }
+
+    public function limit(...$limit)
+    {
+        $limitStr = ' LIMIT ' . implode(',', $limit);
+        $this->options['limit'] = $limitStr;
+        return $this;
+    }
+
+    public function get(array $vars = [])
+    {
+        $sql =  "SELECT {$this->options['fields']} FROM {$this->options['table']} 
+        {$this->options['where']} 
+        {$this->options['order']} 
+        {$this->options['limit']}";
+        die($sql);
+        return $this->query($sql, $vars);
     }
 }
-
-$pdo = DB::getInstance();
-$result = $pdo->query("select * from users", []);
-var_dump($result);
