@@ -10,7 +10,7 @@
 
 <body>
     <?php
-    echo $_SESSION['VALIDATE_ERROR_MESSAGE'];
+    echo @$_SESSION['ERROR_MESSAGE'];
     ?>
     <form action="controller.php" method="post">
         <label>账号</label><input type="text" name="username">

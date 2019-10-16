@@ -21,8 +21,10 @@ class DB
 
 
     private function __construct()
-    {
-        $this->config = include '../config/database.php';
+    { 
+        $ds = DIRECTORY_SEPARATOR;
+        $base_dir = realpath(dirname(__FILE__)  . $ds . '..') . $ds;
+        $this->config = include "{$base_dir}config{$ds}database.php";
         $this->dsn = sprintf(
             "%s:host=%s;dbname=%s;charset=%s",
             $this->config['driver'],
@@ -110,7 +112,7 @@ class DB
         {$this->options['where']} 
         {$this->options['order']} 
         {$this->options['limit']}";
-        die($sql);
         return $this->query($sql, $vars);
     }
 }
+
