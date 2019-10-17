@@ -15,9 +15,16 @@
     }
     ?>
     <form action="controller.php?action=login" method="post">
-        <label>账号</label><input type="text" name="username">
+        <label>用户名</label><input type="text" name="username">
         <label>密码</label><input type="password" name="password">
         <button>提交</button>
+    </form>
+    <hr>
+    <form action="controller.php?action=register" method="post">
+        <label>用户名</label><input type="text" name="username">
+        <label>密码</label><input type="password" name="password">
+        <label>确认密码</label><input type="password" name="confirmPassword">
+        <button>注册</button>
     </form>
 
 </body>
