@@ -8,7 +8,7 @@ class ValidateException extends Exception
 {
     public function render()
     {
-        $_SESSION['VALIDATE_ERROR_MESSAGE'] = '登录失败';
+        $_SESSION['ERROR_MESSAGE'] = $this->getMessage();
         header('Location:index.php');
     }
 }
