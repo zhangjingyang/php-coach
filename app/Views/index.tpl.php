@@ -14,11 +14,12 @@
         echo $_SESSION['ERROR_MESSAGE'];
     }
     ?>
-    <form action="controller.php" method="post">
+    <form action="controller.php?action=login" method="post">
         <label>账号</label><input type="text" name="username">
         <label>密码</label><input type="password" name="password">
         <button>提交</button>
     </form>
+
 </body>
 
 </html>

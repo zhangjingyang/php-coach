@@ -21,7 +21,7 @@ class DB
 
 
     private function __construct()
-    { 
+    {
         $ds = DIRECTORY_SEPARATOR;
         $base_dir = realpath(dirname(__FILE__)  . $ds . '..') . $ds;
         $this->config = include "{$base_dir}config{$ds}database.php";
@@ -68,7 +68,7 @@ class DB
         }
     }
 
-    public function execute(string $sql, array $vars)
+    public function execute(string $sql, array $vars = [])
     {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($vars);
@@ -114,5 +114,13 @@ class DB
         {$this->options['limit']}";
         return $this->query($sql, $vars);
     }
-}
 
+    public function insert(array $vars)
+    {
+        //INSERT INTO USERS () VALUES ()
+        $fields = '`' . implode('`,`', array_keys($vars)) . '`';
+        $values = "'" . implode("','", array_values($vars)) . "'";
+        $sql = "INSERT INTO {$this->options['table']} ( {$fields}) VALUES ({$values})";
+        $this->execute($sql);
+    }
+}
