@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Helper;
 
 use PDO;
 use PDOException;
 
-class DB
+class DBHelper
 {
     private static $__instance = null;
     private $config;
@@ -19,6 +19,16 @@ class DB
         'limit' => ''
     ];
 
+    public function __destruct()
+    {
+        $this->options = [
+            'table' => '',
+            'fields' => '*',
+            'where' => '',
+            'order' => '',
+            'limit' => ''
+        ];
+    }
 
     private function __construct()
     {
@@ -59,6 +69,7 @@ class DB
     public function query(string $sql, array $vars = [])
     {
         try {
+            $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             $stmt = $this->conn->prepare($sql);
             $stmt->execute($vars);
             $result = $stmt->fetchAll();
