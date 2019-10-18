@@ -1,6 +1,9 @@
 <?php
 include 'bootstrap.php';
+header('Content-type: image/jpeg');
 
-use App\Services\DB;
+use Gregwar\Captcha\CaptchaBuilder;
 
-DB::getInstance();
+
+$builder = new CaptchaBuilder;
+$builder->output();

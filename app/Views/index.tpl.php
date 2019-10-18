@@ -10,6 +10,7 @@
 
 <body>
     <?php
+
     if (!empty($_SESSION['ERROR_MESSAGE'])) {
         echo $_SESSION['ERROR_MESSAGE'];
     }
@@ -17,6 +18,7 @@
     <form action="controller.php?action=login" method="post">
         <label>用户名</label><input type="text" name="username">
         <label>密码</label><input type="password" name="password">
+        <img src="controller.php?action=captcha" alt="">
         <button>提交</button>
     </form>
     <hr>
